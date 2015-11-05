@@ -1,17 +1,9 @@
-#! /bin/sh
+#!/bin/bash
 
 # After systemd send kill signal to the rtpengine daemon,
-# Wait 5 sec, then clean the iptables stuffs:
 # 1- delete the forwarding table, 
 # 2- delete the iptables rules related to rtpengine
 # 3- Unload the kernel module xt_RTPENGINE
-	
-sleep 5
-
-# Load the Table ID and delete the file that contains this ID
-rtpengineTable="/etc/default/rtpengine-table"
-. $rtpengineTable
-rm -rf $rtpengineTable
 
 # Check if the kernel module is loaded
 MODEXIST=`/sbin/lsmod | grep "xt_RTPENGINE"`
@@ -20,6 +12,11 @@ if [ -z "$MODEXIST" ]; then
 fi
 
 # Delete the Table
+
+if [ -z "$TABLE" ]; then
+	TABLE=0
+fi
+
 if [ -e /proc/rtpengine/control ]; then
 	echo "del $TABLE" > /proc/rtpengine/control 2>/dev/null
 fi
